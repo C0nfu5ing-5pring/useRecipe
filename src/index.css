@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: bristol;
+  src: url("./fonts/Bristol.otf");
+}
+
+.bristol {
+  font-family: bristol, sans-serif;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
