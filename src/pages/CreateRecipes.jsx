@@ -3,8 +3,10 @@ import { nanoid } from "nanoid";
 import { useContext } from "react";
 import { recipescontext } from "../context/RecipeContext";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const CreateRecipes = () => {
+  let navigate = useNavigate();
   const { data, setdata } = useContext(recipescontext);
   const {
     register,
@@ -16,13 +18,14 @@ const CreateRecipes = () => {
   let SubmitHandler = (recipe) => {
     recipe.id = nanoid();
     setdata([...data, recipe]);
-    toast(
+    toast.success(
       <div className="p-4 bristol uppercase rounded-xl bg-[#FAF0B3] border-2 border-[#2f2f2f] shadow-md">
         <h3 className="text-[#E4572E] font-bold">Recipe Uploaded!</h3>
         <p className="text-sm text-[#2f2f2f]">Check it on the recipe board.</p>
       </div>
     );
     reset();
+    navigate("/recipes");
   };
 
   return (
@@ -43,7 +46,7 @@ const CreateRecipes = () => {
           type="url"
           placeholder="Enter url..."
           className="w-full bg-[#FFF8D6] px-5 py-2 text-base sm:text-lg md:text-xl uppercase placeholder-[#9e9e9e] text-[#2f2f2f] border-3 border-[#2f2f2f] rounded-[1rem] shadow-sm outline-none focus:ring-1 skew-x-2 transition-all"
-          {...register("url", { required: "url is required" })}
+          {...register("url")}
         />
 
         <small className="text-[#E4572E] mb-4 font-bold block mt-1 ml-1 text-sm sm:text-base md:text-lg rotate-[-1deg]">
