@@ -1,14 +1,12 @@
-import { useContext } from "react";
-import { recipescontext } from "../context/RecipeContext";
 import { Link } from "react-router-dom";
 
-const Recipes = () => {
-  let { data } = useContext(recipescontext);
+const Fav = () => {
+  let data = JSON.parse(localStorage.getItem("fav")) || [];
 
   return data.length === 0 ? (
-    <div className="flex min-h-[80vh] mx-15 items-center justify-center bristol text-[#2F2F2F]">
+    <div className="flex items-center min-h-[80vh] mx-15 justify-center bristol text-[#2F2F2F]">
       <h1 className="text-3xl sm:text-5xl text-center md:text-7xl select-none">
-        NO RECIPES ADDED YET.
+        NO FAVOURITE RECIPES ADDED YET.
       </h1>
     </div>
   ) : (
@@ -58,4 +56,4 @@ const Recipes = () => {
   );
 };
 
-export default Recipes;
+export default Fav;

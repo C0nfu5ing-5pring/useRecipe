@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { recipescontext } from "../context/RecipeContext";
 import { useForm } from "react-hook-form";
@@ -13,24 +13,40 @@ const SingleRecipe = () => {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm({
     defaultValues: {
-      title: recipe.title,
-      url: recipe.url,
-      category: recipe.category,
-      ingredients: recipe.ingredients,
-      instructions: recipe.instructions,
-      description: recipe.description,
-      chef: recipe.chef,
+      title: recipe?.title,
+      url: recipe?.url,
+      category: recipe?.category,
+      ingredients: recipe?.ingredients,
+      instructions: recipe?.instructions,
+      description: recipe?.description,
+      chef: recipe?.chef,
     },
   });
+
+  useEffect(() => {
+    if (recipe) {
+      reset({
+        title: recipe.title,
+        url: recipe.url,
+        category: recipe.category,
+        ingredients: recipe.ingredients,
+        instructions: recipe.instructions,
+        description: recipe.description,
+        chef: recipe.chef,
+      });
+    }
+  }, [recipe, reset]);
 
   let SubmitHandler = (recipe) => {
     let index = data.findIndex((recipe) => params.id === recipe.id);
     let copyData = [...data];
     copyData[index] = { ...copyData[index], ...recipe };
     setdata(copyData);
+    localStorage.setItem("recipes", JSON.stringify(copyData));
     toast.success(
       <div className="p-4 bristol uppercase rounded-xl bg-[#FAF0B3] border-2 border-[#2f2f2f] shadow-md">
         <h3 className="text-[#E4572E] font-bold">Recipe Updated!</h3>
@@ -39,8 +55,15 @@ const SingleRecipe = () => {
   };
 
   let DeleteHandler = () => {
-    let filterData = data.filter((recipe) => recipe.id !== params.id);
+    let filterData = data.filter((recipe) => recipe.id != params.id);
+    let updatedFav = favourite.filter((fav) => fav.id != params.id);
+
     setdata(filterData);
+    setFavourite(updatedFav);
+
+    localStorage.setItem("fav", JSON.stringify(updatedFav));
+    localStorage.setItem("recipes", JSON.stringify(filterData));
+
     toast.success(
       <div className="p-4 bristol uppercase rounded-xl bg-[#FAF0B3] border-2 border-[#2f2f2f] shadow-md">
         <h3 className="text-[#E4572E] font-bold">Recipe Deleted!</h3>
@@ -49,8 +72,27 @@ const SingleRecipe = () => {
     navigate("/recipes");
   };
 
+  const [favourite, setFavourite] = useState(
+    JSON.parse(localStorage.getItem("fav")) || []
+  );
+
+  let FavHandler = () => {
+    if (!favourite.some((fav) => fav.id == params.id)) {
+      let copyFav = [...favourite];
+      copyFav.push(recipe);
+      setFavourite(copyFav);
+      localStorage.setItem("fav", JSON.stringify(copyFav));
+    }
+  };
+
+  let UnfavHandler = () => {
+    let filterFav = favourite.filter((fav) => fav.id != recipe?.id);
+    setFavourite(filterFav);
+    localStorage.setItem("fav", JSON.stringify(filterFav));
+  };
+
   return recipe ? (
-    <div className="bristol uppercase px-6 py-12 sm:px-12 lg:px-32 text-[#2f2f2f]">
+    <div className="bristol relative uppercase px-6 py-12 sm:px-12 lg:px-32 text-[#2f2f2f]">
       <div className="w-full h-64 sm:h-96 rounded-xl overflow-hidden shadow-md mb-8">
         <img
           src={
@@ -64,9 +106,24 @@ const SingleRecipe = () => {
       </div>
 
       <div className="mb-6">
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-2">
-          {recipe.title}
-        </h1>
+        <div className="flex items-start justify-between gap-2">
+          <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold tracking-tight mb-2 break-words w-full">
+            {recipe.title}
+          </h1>
+
+          {favourite.find((fav) => fav.id == recipe.id) ? (
+            <i
+              onClick={UnfavHandler}
+              className="ri-heart-fill text-2xl sm:text-3xl lg:text-4xl cursor-pointer text-[#e7542e] mt-1"
+            ></i>
+          ) : (
+            <i
+              onClick={FavHandler}
+              className="ri-heart-line text-2xl sm:text-3xl lg:text-4xl cursor-pointer text-[#e7542e] mt-1"
+            ></i>
+          )}
+        </div>
+
         <p className="text-xl sm:text-2xl text-[#E4572E] font-semibold uppercase">
           By {recipe.chef}
         </p>
@@ -137,7 +194,7 @@ const SingleRecipe = () => {
         <input
           type="text"
           placeholder="Give it a title..."
-          className="w-full bg-[#FFF8D6] px-5 py-2 rotate- [1deg] text-base sm:text-lg md:text-xl uppercase placeholder-[#9e9e9e] text-[#2f2f2f] border-3 border-[#2f2f2f] rounded-[1rem] shadow-sm outline-none focus:ring-1 skew-x-2 transition-all"
+          className="w-full bg-[#FFF8D6] px-5 py-2 rotate-[-1deg] text-base sm:text-lg md:text-xl uppercase placeholder-[#9e9e9e] text-[#2f2f2f] border-3 border-[#2f2f2f] rounded-[1rem] shadow-sm outline-none focus:ring-1 skew-x-2 transition-all"
           {...register("title", {
             required: "Title is required",
             minLength: { value: 2, message: "Too short" },
@@ -152,7 +209,7 @@ const SingleRecipe = () => {
           placeholder="Chef's name..."
           className="w-full bg-[#FFF8D6] px-5 py-2 rotate-[-1deg] text-base sm:text-lg md:text-xl uppercase placeholder-[#9e9e9e] text-[#2f2f2f] border-3 border-[#2f2f2f] rounded-[1rem] shadow-sm outline-none focus:ring-1 skew-x-2 transition-all"
           {...register("chef", {
-            require: "Chef's name is required",
+            required: "Chef's name is required",
             minLength: { value: 2, message: "Too short" },
             maxLength: { value: 60, message: "Too long" },
           })}

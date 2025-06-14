@@ -17,7 +17,10 @@ const CreateRecipes = () => {
 
   let SubmitHandler = (recipe) => {
     recipe.id = nanoid();
-    setdata([...data, recipe]);
+    let copyData = [...data];
+    copyData.push(recipe);
+    setdata(copyData);
+    localStorage.setItem("recipes", JSON.stringify(copyData));
     toast.success(
       <div className="p-4 bristol uppercase rounded-xl bg-[#FAF0B3] border-2 border-[#2f2f2f] shadow-md">
         <h3 className="text-[#E4572E] font-bold">Recipe Uploaded!</h3>
@@ -29,7 +32,7 @@ const CreateRecipes = () => {
   };
 
   return (
-    <div className="flex bristol justify-center items-center min-h-[90vh]">
+    <div className="flex bristol justify-center items-center min-h-[80vh]">
       <form
         onSubmit={handleSubmit(SubmitHandler)}
         className="p-10 h-[75vh] overflow-auto scrollbar text-center rounded-[2rem] border-4 border-[#2f2f2f] bg-[#FAF0B3] shadow-xl rotate-[-1deg]"
