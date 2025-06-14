@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 const Home = () => {
   return (
     <>
-      <div className="min-h-[90vh] flex flex-col gap-5 justify-center items-center ">
+      <div className="min-h-[80vh] flex flex-col gap-5 justify-center items-center ">
         <h1 className="bristol select-none text-[#2f2f2f] text-8xl sm:text-[10rem] md:text-[12rem] lg:text-[15rem]">
           useRecipe
         </h1>
@@ -17,6 +17,8 @@ const Home = () => {
           Create Recipe
         </NavLink>
       </div>
+
+      <input type="text" inputMode="numeric" pattern="[0-9]*" />
     </>
   );
 };
